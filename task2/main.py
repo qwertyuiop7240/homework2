@@ -238,22 +238,18 @@ def check_win(field):
         end_game = end_comb[-1]
         display_win(field)
         question_about_continuation()
-        print(end_comb)
     elif (end_comb := check_win_diagonal_left(field)) != False:
         end_game = end_comb[-1]
         display_win(field)
         question_about_continuation()
-        print(end_comb)
     elif (end_comb := check_win_horizontal(field)) != False:
         end_game = end_comb[-1]
         display_win(field)
         question_about_continuation()
-        print(end_comb)
     elif (end_comb := check_win_vertical(field)) != False:
         end_game = end_comb[-1]
         display_win(field)
         question_about_continuation()
-        print(end_comb)
     else:
         end_game = False
         print(end_game)
