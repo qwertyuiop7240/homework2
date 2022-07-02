@@ -1,15 +1,8 @@
 from tkinter import *
-
-root = Tk()
-game_run = True
-field = []
-cross_count = 0
-end_game = False
-end_comb = []
-weight_charts = []
+import random
 
 
-def x():
+def map_creation():
     map_i = []
     for row in range(10):
         row_i = []
@@ -17,6 +10,19 @@ def x():
             row_i.append(0)
         map_i.append(row_i)
     return map_i
+
+
+first_play = 0
+root = Tk()
+game_run = True
+field = []
+cross_count = 0
+end_game = False
+end_comb = []
+weight_charts = map_creation()
+max_weight = 0
+list_of_movies = []
+next_move = [5, 5]
 
 
 def who_first_play(value):
@@ -48,7 +54,8 @@ def game_window(window):
                             font=('Verdana', 20, 'bold'),
                             background='lavender',
                             command=lambda row=row, col=col: [click(row, col), check_win(field), occupied_cells(field),
-                                                              first_selection()])
+                                                              first_selection(), heaviest_weight(),
+                                                              choice_of_possible_move(field), check_win(field)])
             button.grid(row=row, column=col, sticky='nsew')
             line.append(button)
         field.append(line)
@@ -265,31 +272,48 @@ def check_win(field):
         end_game = False
 
 
+def heaviest_weight():
+    global weight_charts
+    global max_weight
+    max_weight = 0
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] > max_weight:
+                max_weight = weight_charts[row][col]
+
+
+def choice_of_possible_move(field):
+    global weight_charts
+    global list_of_movies
+    global max_weight
+    global next_move
+    global first_play
+    list_of_movies = []
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == max_weight:
+                list_of_movies.append([row, col])
+    random_index = random.randint(0, len(list_of_movies) - 1)
+    next_move = list_of_movies[random_index]
+    if first_play:
+        field[next_move[0]][next_move[1]]['text'] = 'O'
+    else:
+        field[next_move[0]][next_move[1]]['text'] = 'X'
+
+
 def first_selection():
     global weight_charts
     for row in range(10):
         for col in range(10):
             if weight_charts[row][col] == -1:
-                if row == 0 and col == 0:
-                    weight_charts[row][col + 1] = 1
-                    weight_charts[row + 1][col + 1] = 1
-                    weight_charts[row + 1][col] = 1
-                elif row == 0 and col == 9:
-                    weight_charts[row][col - 1] = 1
-                    weight_charts[row + 1][col - 1] = 1
-                    weight_charts[row + 1][col] = 1
-                elif row == 9 and col == 0:
-                    weight_charts[row][col + 1] = 1
-                    weight_charts[row - 1][col + 1] = 1
-                    weight_charts[row - 1][col] = 1
-                elif row == 9 and col == 9:
-                    weight_charts[row][col - 1] = 1
-                    weight_charts[row - 1][col - 1] = 1
-                    weight_charts[row - 1][col] = 1
-                elif row == 0 or col == 9 or row == 9 or col == 0:
-                    pass
-                else:
-                    pass
+                for i in range(-1, 2):
+                    for k in range(-1, 2):
+                        try:
+                            if weight_charts[row + i][col + k] == 0 and row + i >= 0 and col + k >= 0:
+                                weight_charts[row + i][col + k] = 1
+                        except:
+                            continue
+
     for i in weight_charts:
         print(i)
     print('-----------------------------')
@@ -298,13 +322,9 @@ def first_selection():
 def occupied_cells(field):
     global weight_charts
     for row in range(10):
-        row_i = []
         for col in range(10):
             if field[row][col]['text'] == 'X' or field[row][col]['text'] == 'O':
-                row_i.append(-1)
-            else:
-                row_i.append(0)
-        weight_charts.append(row_i)
+                weight_charts[row][col] = -1
 
 
 start_window(root)
