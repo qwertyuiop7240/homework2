@@ -1,5 +1,4 @@
 from tkinter import *
-import random
 
 root = Tk()
 game_run = True
@@ -7,6 +6,17 @@ field = []
 cross_count = 0
 end_game = False
 end_comb = []
+weight_charts = []
+
+
+def x():
+    map_i = []
+    for row in range(10):
+        row_i = []
+        for col in range(10):
+            row_i.append(0)
+        map_i.append(row_i)
+    return map_i
 
 
 def who_first_play(value):
@@ -37,7 +47,8 @@ def game_window(window):
             button = Button(window, text=' ', width=2, height=1,
                             font=('Verdana', 20, 'bold'),
                             background='lavender',
-                            command=lambda row=row, col=col: [click(row, col), check_win(field)])
+                            command=lambda row=row, col=col: [click(row, col), check_win(field), occupied_cells(field),
+                                                              first_selection()])
             button.grid(row=row, column=col, sticky='nsew')
             line.append(button)
         field.append(line)
@@ -252,6 +263,48 @@ def check_win(field):
         question_about_continuation()
     else:
         end_game = False
+
+
+def first_selection():
+    global weight_charts
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == -1:
+                if row == 0 and col == 0:
+                    weight_charts[row][col + 1] = 1
+                    weight_charts[row + 1][col + 1] = 1
+                    weight_charts[row + 1][col] = 1
+                elif row == 0 and col == 9:
+                    weight_charts[row][col - 1] = 1
+                    weight_charts[row + 1][col - 1] = 1
+                    weight_charts[row + 1][col] = 1
+                elif row == 9 and col == 0:
+                    weight_charts[row][col + 1] = 1
+                    weight_charts[row - 1][col + 1] = 1
+                    weight_charts[row - 1][col] = 1
+                elif row == 9 and col == 9:
+                    weight_charts[row][col - 1] = 1
+                    weight_charts[row - 1][col - 1] = 1
+                    weight_charts[row - 1][col] = 1
+                elif row == 0 or col == 9 or row == 9 or col == 0:
+                    pass
+                else:
+                    pass
+    for i in weight_charts:
+        print(i)
+    print('-----------------------------')
+
+
+def occupied_cells(field):
+    global weight_charts
+    for row in range(10):
+        row_i = []
+        for col in range(10):
+            if field[row][col]['text'] == 'X' or field[row][col]['text'] == 'O':
+                row_i.append(-1)
+            else:
+                row_i.append(0)
+        weight_charts.append(row_i)
 
 
 start_window(root)
