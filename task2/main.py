@@ -252,7 +252,6 @@ def check_win(field):
         question_about_continuation()
     else:
         end_game = False
-        print(end_game)
 
 
 start_window(root)
