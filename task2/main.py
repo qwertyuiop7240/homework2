@@ -40,9 +40,9 @@ def who_first_play(value):
 def start_window(window):
     window.title("Игра 'Крестики нолики'")
     i_first = Button(window, text='Я хочу начать первым',
-                     command=lambda: [who_first_play(1), change_window_start_on_window_game(), new_game()])
+                     command=lambda: [who_first_play(1), change_window_start_on_window_game()])
     i_no_first = Button(window, text='Пусть компьютер начнет первым',
-                        command=lambda: [who_first_play(0), change_window_start_on_window_game(), new_game()])
+                        command=lambda: [who_first_play(0), change_window_start_on_window_game()])
     i_first.grid(row=0, column=1, columnspan=2, sticky=N + S + W + E, padx=5, pady=5, ipadx=5, ipady=5)
     i_no_first.grid(row=0, column=7, columnspan=2, sticky=N + S + W + E, padx=5, pady=5, ipadx=5, ipady=5)
     window_center(window)
@@ -62,6 +62,7 @@ def game_window(window):
             line.append(button)
         field.append(line)
     window_center(window)
+    new_game()
     window.mainloop()
 
 
@@ -92,15 +93,28 @@ def question_about_continuation():
 
 
 def new_game():
+    global game_run
+    global weight_charts
+    global end_game
+    global end_comb
+    global max_weight
+    global list_of_movies
+    global next_move
     for row in range(10):
         for col in range(10):
             field[row][col]['text'] = ' '
             field[row][col]['background'] = 'lavender'
             field[row][col]['fg'] = 'black'
-    global game_run
     game_run = True
-    global weight_charts
     weight_charts = map_creation()
+    end_game = False
+    end_comb = []
+    max_weight = 0
+    list_of_movies = []
+    next_move = [5, 5]
+    if computer_play:
+        field[5][5]['text'] = 'X'
+    print(computer_play)
 
 
 def click(row, col):
