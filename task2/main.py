@@ -96,7 +96,6 @@ def new_game():
     next_move = [5, 5]
     if computer_play:
         field[5][5]['text'] = 'X'
-    print(computer_play)
 
 
 def click_person(row, col):
@@ -285,6 +284,7 @@ def check_win():
 
 def play_AI():
     global field
+    global computer_play
     global weight_charts
     global max_weight
     global list_of_movies
@@ -474,7 +474,7 @@ def play_AI():
                 if weight_charts[row][col] == 3:
                     if (check_four_horizontal(row, col, x)) or (check_four_vertical(row, col, x)) or (
                             check_four_diagonal_right(row, col, x)) or (check_four_diagonal_left(row, col, x)):
-                        weight_charts[row][col] = 4
+                        weight_charts[row][col] = 5
 
     def fifth_selection():
         global weight_charts
@@ -543,12 +543,12 @@ def play_AI():
 
         for row in range(10):
             for col in range(10):
-                if weight_charts[row][col] == 4:
+                if weight_charts[row][col] == 5:
                     if (check_five_horizontal(row, col, x)) or (check_five_vertical(row, col, x)) or (
                             check_five_diagonal_right(row, col, x)) or (check_five_diagonal_left(row, col, x)):
-                        weight_charts[row][col] = 8
+                        weight_charts[row][col] = 7
 
-    def sixth_selection():
+    def sixth_selection(price):
         global weight_charts
         global computer_play
         global field
@@ -569,8 +569,8 @@ def play_AI():
             if kol == 2:
                 for i in [-1, 1]:
                     try:
-                        if field[row][col + i]['text'] == ' ':
-                            weight_charts[row][col + i] = 6
+                        if field[row][col + i]['text'] == ' ' and weight_charts[row][col + i] < price:
+                            weight_charts[row][col + i] = price
                     except:
                         continue
 
@@ -586,8 +586,8 @@ def play_AI():
             if kol == 2:
                 for i in [-1, 1]:
                     try:
-                        if field[row + i][col]['text'] == ' ':
-                            weight_charts[row + i][col] = 6
+                        if field[row + i][col]['text'] == ' ' and weight_charts[row + i][col] < price:
+                            weight_charts[row + i][col] = price
                     except:
                         continue
 
@@ -603,8 +603,8 @@ def play_AI():
             if kol == 2:
                 for i in [-1, 1]:
                     try:
-                        if field[row + i][col + i]['text'] == ' ':
-                            weight_charts[row + i][col + i] = 6
+                        if field[row + i][col + i]['text'] == ' ' and weight_charts[row + i][col + i] < price:
+                            weight_charts[row + i][col + i] = price
                     except:
                         continue
 
@@ -620,8 +620,8 @@ def play_AI():
             if kol == 2:
                 for i in [-1, 1]:
                     try:
-                        if field[row - i][col + i]['text'] == ' ':
-                            weight_charts[row - i][col + i] = 6
+                        if field[row - i][col + i]['text'] == ' ' and weight_charts[row - i][col + i] < price:
+                            weight_charts[row - i][col + i] = price
                     except:
                         continue
 
@@ -633,7 +633,7 @@ def play_AI():
                     check_three_diagonal_right(row, col, x)
                     check_three_diagonal_left(row, col, x)
 
-    def seventh_selection():
+    def seventh_selection(price):
         global weight_charts
         global computer_play
         global field
@@ -654,8 +654,8 @@ def play_AI():
             if kol == 3:
                 for i in [-1, 1]:
                     try:
-                        if field[row][col + i]['text'] == ' ':
-                            weight_charts[row][col + i] = 7
+                        if field[row][col + i]['text'] == ' ' and weight_charts[row][col + i] < price:
+                            weight_charts[row][col + i] = price
                     except:
                         continue
 
@@ -671,8 +671,8 @@ def play_AI():
             if kol == 3:
                 for i in [-1, 1]:
                     try:
-                        if field[row + i][col]['text'] == ' ':
-                            weight_charts[row + i][col] = 7
+                        if field[row + i][col]['text'] == ' ' and weight_charts[row + i][col] < price:
+                            weight_charts[row + i][col] = price
                     except:
                         continue
 
@@ -688,8 +688,8 @@ def play_AI():
             if kol == 3:
                 for i in [-1, 1]:
                     try:
-                        if field[row + i][col + i]['text'] == ' ':
-                            weight_charts[row + i][col + i] = 7
+                        if field[row + i][col + i]['text'] == ' ' and weight_charts[row + i][col + i] < price:
+                            weight_charts[row + i][col + i] = price
                     except:
                         continue
 
@@ -705,8 +705,8 @@ def play_AI():
             if kol == 3:
                 for i in [-1, 1]:
                     try:
-                        if field[row - i][col + i]['text'] == ' ':
-                            weight_charts[row - i][col + i] = 7
+                        if field[row - i][col + i]['text'] == ' ' and weight_charts[row - i][col + i] < price:
+                            weight_charts[row - i][col + i] = price
                     except:
                         continue
 
@@ -752,14 +752,11 @@ def play_AI():
         third_selection()
         fourth_selection()
         fifth_selection()
-        sixth_selection()
-        seventh_selection()
+        sixth_selection(4)
+        seventh_selection(6)
         heaviest_weight()
         choice_of_possible_move()
         check_win()
-        for i in weight_charts:
-            print(i)
-        print('-----------------------------')
         weight_charts = map_creation()
         max_weight = 0
         list_of_movies = []
