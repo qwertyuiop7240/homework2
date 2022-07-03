@@ -12,7 +12,8 @@ def map_creation():
     return map_i
 
 
-first_play = 0
+person_play = 0
+computer_play = 0
 root = Tk()
 game_run = True
 field = []
@@ -26,11 +27,14 @@ next_move = [5, 5]
 
 
 def who_first_play(value):
-    global first_play
+    global person_play
+    global computer_play
     if value:
-        first_play = 1
+        person_play = 1
+        computer_play = 0
     else:
-        first_play = 0
+        person_play = 0
+        computer_play = 1
 
 
 def start_window(window):
@@ -54,8 +58,11 @@ def game_window(window):
                             font=('Verdana', 20, 'bold'),
                             background='lavender',
                             command=lambda row=row, col=col: [click(row, col), check_win(field), occupied_cells(field),
-                                                              first_selection(), heaviest_weight(),
-                                                              choice_of_possible_move(field), check_win(field)])
+                                                              first_selection(), second_selection(), third_selection(),
+                                                              fourth_selection(), fifth_selection(),
+                                                              heaviest_weight(),
+                                                              choice_of_possible_move(field), check_win(field),
+                                                              occupied_cells(field)])
             button.grid(row=row, column=col, sticky='nsew')
             line.append(button)
         field.append(line)
@@ -97,13 +104,13 @@ def new_game():
             field[row][col]['fg'] = 'black'
     global game_run
     game_run = True
-    global cross_count
-    cross_count = 0
+    global weight_charts
+    weight_charts = map_creation()
 
 
 def click(row, col):
     if game_run and field[row][col]['text'] == ' ':
-        if first_play:
+        if person_play:
             field[row][col]['text'] = 'X'
             value = 'O'
         else:
@@ -243,9 +250,9 @@ def check_win(field):
             for i in range(5):
                 row = end_comb[i][0]
                 col = end_comb[i][1]
-                if first_play == 1 and field[row][col]['text'] == 'X':
+                if person_play == 1 and field[row][col]['text'] == 'X':
                     field[row][col]['fg'] = 'green'
-                elif first_play == 0 and field[row][col]['text'] == 'O':
+                elif person_play == 0 and field[row][col]['text'] == 'O':
                     field[row][col]['fg'] = 'green'
                 else:
                     field[row][col]['fg'] = 'red'
@@ -287,7 +294,7 @@ def choice_of_possible_move(field):
     global list_of_movies
     global max_weight
     global next_move
-    global first_play
+    global person_play
     list_of_movies = []
     for row in range(10):
         for col in range(10):
@@ -295,7 +302,7 @@ def choice_of_possible_move(field):
                 list_of_movies.append([row, col])
     random_index = random.randint(0, len(list_of_movies) - 1)
     next_move = list_of_movies[random_index]
-    if first_play:
+    if person_play:
         field[next_move[0]][next_move[1]]['text'] = 'O'
     else:
         field[next_move[0]][next_move[1]]['text'] = 'X'
@@ -311,12 +318,248 @@ def first_selection():
                         try:
                             if weight_charts[row + i][col + k] == 0 and row + i >= 0 and col + k >= 0:
                                 weight_charts[row + i][col + k] = 1
-                        except:
+                        except IndexError:
                             continue
 
-    for i in weight_charts:
-        print(i)
-    print('-----------------------------')
+
+def second_selection():
+    global weight_charts
+    global computer_play
+    global field
+    if computer_play:
+        x = 'X'
+    else:
+        x = 'O'
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == 1:
+                for i in range(-1, 2):
+                    for k in range(-1, 2):
+                        try:
+                            if (weight_charts[row + i][col + k] == -1) and (row + i >= 0) and (col + k >= 0) and (
+                                    field[row + i][col + k]['text'] == x):
+                                weight_charts[row][col] = 2
+                        except IndexError:
+                            continue
+
+
+def third_selection():
+    global weight_charts
+    global computer_play
+    global field
+    if computer_play:
+        x = 'X'
+    else:
+        x = 'O'
+
+    def check_three_horizontal(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-2, -1, 1, 2]:
+            try:
+                if field[row][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 2:
+            three_check = True
+        return three_check
+
+    def check_three_vertical(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-2, -1, 1, 2]:
+            try:
+                if field[row + i][col]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 2:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_right(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-2, -1, 1, 2]:
+            try:
+                if field[row + i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 2:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_left(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-2, -1, 1, 2]:
+            try:
+                if field[row - i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 2:
+            three_check = True
+        return three_check
+
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == 2:
+                if (check_three_horizontal(row, col, x)) or (check_three_vertical(row, col, x)) or (
+                        check_three_diagonal_right(row, col, x)) or (check_three_diagonal_left(row, col, x)):
+                    weight_charts[row][col] = 3
+
+
+def fourth_selection():
+    global weight_charts
+    global computer_play
+    global field
+    if computer_play:
+        x = 'X'
+    else:
+        x = 'O'
+
+    def check_three_horizontal(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-3, -2, -1, 1, 2, 3]:
+            try:
+                if field[row][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 3:
+            three_check = True
+        return three_check
+
+    def check_three_vertical(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-3, -2, -1, 1, 2, 3]:
+            try:
+                if field[row + i][col]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 3:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_right(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-3, -2, -1, 1, 2, 3]:
+            try:
+                if field[row + i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 3:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_left(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-3, -2, -1, 1, 2, 3]:
+            try:
+                if field[row - i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 3:
+            three_check = True
+        return three_check
+
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == 3:
+                if (check_three_horizontal(row, col, x)) or (check_three_vertical(row, col, x)) or (
+                        check_three_diagonal_right(row, col, x)) or (check_three_diagonal_left(row, col, x)):
+                    weight_charts[row][col] = 4
+
+
+def fifth_selection():
+    global weight_charts
+    global computer_play
+    global field
+    if computer_play:
+        x = 'X'
+    else:
+        x = 'O'
+
+    def check_three_horizontal(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-4, -3, -2, -1, 1, 2, 3, 4]:
+            try:
+                if field[row][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 4:
+            three_check = True
+        return three_check
+
+    def check_three_vertical(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-4, -3, -2, -1, 1, 2, 3, 4]:
+            try:
+                if field[row + i][col]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 4:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_right(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-4, -3, -2, -1, 1, 2, 3, 4]:
+            try:
+                if field[row + i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 4:
+            three_check = True
+        return three_check
+
+    def check_three_diagonal_left(row, col, x):
+        global weight_charts
+        three_check = False
+        kol = 0
+        for i in [-4, -3, -2, -1, 1, 2, 3, 4]:
+            try:
+                if field[row - i][col + i]['text'] == x:
+                    kol += 1
+            except:
+                continue
+        if kol == 4:
+            three_check = True
+        return three_check
+
+    for row in range(10):
+        for col in range(10):
+            if weight_charts[row][col] == 4:
+                if (check_three_horizontal(row, col, x)) or (check_three_vertical(row, col, x)) or (
+                        check_three_diagonal_right(row, col, x)) or (check_three_diagonal_left(row, col, x)):
+                    weight_charts[row][col] = 5
 
 
 def occupied_cells(field):
@@ -325,6 +568,9 @@ def occupied_cells(field):
         for col in range(10):
             if field[row][col]['text'] == 'X' or field[row][col]['text'] == 'O':
                 weight_charts[row][col] = -1
+    for i in weight_charts:
+        print(i)
+    print('-----------------------------')
 
 
 start_window(root)
