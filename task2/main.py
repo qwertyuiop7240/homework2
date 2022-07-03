@@ -554,7 +554,7 @@ def fifth_selection():
             if weight_charts[row][col] == 4:
                 if (check_three_horizontal(row, col, x)) or (check_three_vertical(row, col, x)) or (
                         check_three_diagonal_right(row, col, x)) or (check_three_diagonal_left(row, col, x)):
-                    weight_charts[row][col] = 5
+                    weight_charts[row][col] = 10
 
 
 def sixth_selection():
@@ -740,6 +740,9 @@ def occupied_cells(field):
 def play_AI():
     global field
     global weight_charts
+    global max_weight
+    global list_of_movies
+    global next_move
     occupied_cells(field)
     first_selection()
     second_selection()
@@ -754,6 +757,10 @@ def play_AI():
     for i in weight_charts:
         print(i)
     print('-----------------------------')
+    weight_charts = map_creation()
+    max_weight = 0
+    list_of_movies = []
+    next_move = []
 
 
 start_window(root)
